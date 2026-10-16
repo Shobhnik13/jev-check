@@ -146,7 +146,7 @@ export const api = {
 
   runCheck: (checklistId: number, image: Blob, source: Run['source']) => call<{run: Run}>('/runs', form({checklist_id: String(checklistId), image, source})).then((d) => d.run),
   previewCheck: (checklistId: number, image: Blob) => call<{run: Preview}>('/runs', form({checklist_id: String(checklistId), image, save: '0'})).then((d) => d.run),
-  savePreview: (checklistId: number, previewId: string) => call<{run: Run}>('/runs', json('POST', {checklist_id: checklistId, preview_id: previewId, source: 'live'})).then((d) => d.run),
+  savePreview: (checklistId: number, previewId: string, image: Blob) => call<{run: Run}>('/runs', form({checklist_id: String(checklistId), preview_id: previewId, image, source: 'live'})).then((d) => d.run),
   getRuns: (params: {checklist_id?: number; verdict?: Verdict; unreviewed?: boolean}) => {
     const qs = new URLSearchParams();
 

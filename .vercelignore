@@ -4,4 +4,4 @@
 **/*.pem
 **/*.tsbuildinfo
 frontend/certificates
-backend
+backend/data

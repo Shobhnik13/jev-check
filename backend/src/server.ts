@@ -63,8 +63,13 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   res.status(status.http).json(status.body);
 });
 
-await initDb();
+// On Vercel the platform serves the exported app; locally it listens on a port.
+if (!process.env.VERCEL) {
+  await initDb();
 
-app.listen(config.PORT, () => {
-  console.log(`jev-checks backend on :${config.PORT} (model ${config.JEV.MODEL}${config.JEV.MOCK ? ', MOCK' : ''})`);
-});
+  app.listen(config.PORT, () => {
+    console.log(`jev-check backend on :${config.PORT} (model ${config.JEV.MODEL}${config.JEV.MOCK ? ', MOCK' : ''})`);
+  });
+}
+
+export default app;

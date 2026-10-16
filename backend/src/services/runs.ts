@@ -31,9 +31,15 @@ export async function createRun(params: {ownerId: number; checklistId: number; i
 
   if (params.previewId) {
     let preview = previews.get(params.previewId);
+    let usable = preview && preview.expiresAt >= Date.now() && preview.ownerId === params.ownerId && preview.checklistId === params.checklistId;
 
-    if (!preview || preview.expiresAt < Date.now() || preview.ownerId !== params.ownerId || preview.checklistId !== params.checklistId) {
-      throw new AppError('preview_expired');
+    // Serverless instances don't share memory: without the cached preview, judge the resent frame again.
+    if (!usable || !preview) {
+      if (!params.image) {
+        throw new AppError('preview_expired');
+      }
+
+      return createRun({...params, previewId: undefined, save: true});
     }
 
     previews.delete(preview.id);

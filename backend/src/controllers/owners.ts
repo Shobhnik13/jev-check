@@ -29,6 +29,14 @@ export async function getFile(req: Request, res: Response) {
     return;
   }
 
+  let file = await utilsService.openUpload(relativePath);
+
+  if (!file) {
+    res.status(404).end();
+    return;
+  }
+
+  res.setHeader('Content-Type', 'image/jpeg');
   res.setHeader('Cache-Control', 'private, max-age=31536000, immutable');
-  res.sendFile(utilsService.uploadPath(relativePath), (err) => (err && !res.headersSent ? res.status(404).end() : null));
+  file.on('error', () => res.destroy()).pipe(res);
 }

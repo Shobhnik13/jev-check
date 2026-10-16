@@ -17,7 +17,8 @@ export async function createRun(req: Request, res: Response) {
   }
 
   let runParams: Parameters<typeof runsService.createRun>[0] = {ownerId: req.owner.id, checklistId: parseInt(req.body.checklist_id)};
-  req.file ? (runParams.image = req.file.buffer) : (runParams.previewId = String(req.body.preview_id));
+  req.file ? (runParams.image = req.file.buffer) : null;
+  req.body.preview_id ? (runParams.previewId = String(req.body.preview_id)) : null;
   req.body.source ? (runParams.source = _oneOf(req.body.source, SOURCES, 'source')) : null;
   Object.hasOwn(req.body, 'save') ? (runParams.save = req.body.save !== '0' && req.body.save !== false) : null;
 

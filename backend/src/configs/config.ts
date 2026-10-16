@@ -7,8 +7,6 @@ const ROOT = path.resolve(import.meta.dirname, '../..');
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, 'data');
 const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 
-fs.mkdirSync(UPLOADS_DIR, {recursive: true});
-
 export const config = {
   PORT: Number(process.env.PORT || 4000),
   ROOT,
@@ -62,6 +60,7 @@ export const db = knex({
   pool: {min: 0, max: Number(process.env.DB_POOL_MAX || 5)},
 });
 
+// The schema is idempotent. Serverless deploys skip it on cold start; run `npm run db:init` after schema changes.
 export async function initDb() {
   await db.raw(fs.readFileSync(config.SQL_INIT, 'utf8'));
 }

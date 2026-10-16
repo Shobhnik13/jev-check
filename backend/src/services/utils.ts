@@ -1,5 +1,10 @@
+import {createReadStream} from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {Readable} from 'node:stream';
+import type {ReadableStream as WebReadableStream} from 'node:stream/web';
+
+import {get, put} from '@vercel/blob';
 
 import {config} from '@/configs/config';
 import {AppError} from '@/configs/status';
@@ -38,18 +43,51 @@ export function ownsUpload(ownerId: number, relativePath: string) {
   return relativePath.startsWith(`${ownerDir(ownerId)}/`) && !relativePath.includes('..');
 }
 
-export function uploadPath(relativePath: string) {
-  return _resolve(relativePath);
-}
+// Photos go to a private Vercel Blob store when one is connected, otherwise to the local disk.
+const useBlob = Boolean(process.env.BLOB_STORE_ID || process.env.BLOB_READ_WRITE_TOKEN);
 
 export async function writeUpload(relativePath: string, buffer: Buffer) {
+  if (useBlob) {
+    await put(relativePath, buffer, {access: 'private', contentType: 'image/jpeg', addRandomSuffix: false, allowOverwrite: true});
+    return;
+  }
+
   let fullPath = _resolve(relativePath);
   await fs.mkdir(path.dirname(fullPath), {recursive: true});
   await fs.writeFile(fullPath, buffer);
 }
 
 export async function readUpload(relativePath: string): Promise<Buffer> {
+  if (useBlob) {
+    let file = await _blob(relativePath);
+    return Buffer.from(await new Response(file.stream).arrayBuffer());
+  }
+
   return fs.readFile(_resolve(relativePath));
+}
+
+export async function openUpload(relativePath: string): Promise<Readable | null> {
+  try {
+    if (useBlob) {
+      return Readable.fromWeb((await _blob(relativePath)).stream as WebReadableStream);
+    }
+
+    let fullPath = _resolve(relativePath);
+    await fs.access(fullPath);
+    return createReadStream(fullPath);
+  } catch {
+    return null;
+  }
+}
+
+async function _blob(relativePath: string) {
+  let file = await get(relativePath, {access: 'private'});
+
+  if (!file || file.statusCode !== 200) {
+    throw new AppError('entity_missing', 'file');
+  }
+
+  return file;
 }
 
 function _resolve(relativePath: string) {

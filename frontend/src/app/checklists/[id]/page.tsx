@@ -157,6 +157,7 @@ function LiveCheck() {
   const [error, setError] = useState<string | null>(null);
 
   const settings = useRef({autoSave, streak: 0});
+  const frames = useRef(new Map<string, Blob>());
 
   useEffect(() => {
     settings.current.autoSave = autoSave;
@@ -164,7 +165,7 @@ function LiveCheck() {
 
   const save = useCallback(
     async (preview: Preview) => {
-      const run = await api.savePreview(checklist.id, preview.preview_id);
+      const run = await api.savePreview(checklist.id, preview.preview_id, frames.current.get(preview.preview_id)!);
       setSaved((list) => [run, ...list]);
       setFlash(true);
       setTimeout(() => setFlash(false), 180);
@@ -186,11 +187,16 @@ function LiveCheck() {
         const startedAt = performance.now();
 
         try {
-          const preview = await api.previewCheck(checklist.id, await grabFrame(videoRef.current!));
+          const frame = await grabFrame(videoRef.current!);
+          const preview = await api.previewCheck(checklist.id, frame);
 
           if (!alive) {
             break;
           }
+
+          // Keep the last few frames so a save can resend the exact photo that was judged.
+          frames.current.set(preview.preview_id, frame);
+          [...frames.current.keys()].slice(0, -5).forEach((id) => frames.current.delete(id));
 
           errors = 0;
           setError(null);
