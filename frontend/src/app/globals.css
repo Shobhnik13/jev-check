@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Theme tokens. fg = strongest text and hairlines; fg-inverse sits on top of fg. */
+@theme {
+  --color-fg: #ffffff;
+  --color-fg-inverse: #09090b;
+}
+
+:root {
+  color-scheme: dark;
+  --page: #09090b;
+}
+
+/*
+ * Light mode flips the zinc scale, so every zinc-* class keeps its role (surface, border, muted text)
+ * in both themes, and darkens the pale accent text colors so they stay readable on white.
+ */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page: oklch(96.7% 0.001 286.375);
+  --color-fg: oklch(14.1% 0.005 285.823);
+  --color-fg-inverse: #ffffff;
+
+  --color-zinc-50: oklch(14.1% 0.005 285.823);
+  --color-zinc-100: oklch(21% 0.006 285.885);
+  --color-zinc-200: oklch(27.4% 0.006 286.033);
+  --color-zinc-300: oklch(37% 0.013 285.805);
+  --color-zinc-400: oklch(44.2% 0.017 285.786);
+  --color-zinc-500: oklch(55.2% 0.016 285.938);
+  --color-zinc-600: oklch(70.5% 0.015 286.067);
+  --color-zinc-700: oklch(92% 0.004 286.32);
+  --color-zinc-800: oklch(94.5% 0.003 286.35);
+  --color-zinc-900: #ffffff;
+  --color-zinc-950: oklch(98.5% 0 0);
+
+  --color-lime-200: oklch(45.3% 0.124 130.933);
+  --color-lime-300: oklch(53.2% 0.157 131.589);
+  --color-amber-200: oklch(47.3% 0.137 46.201);
+  --color-amber-300: oklch(55.5% 0.163 48.998);
+  --color-rose-200: oklch(45.5% 0.188 13.697);
+  --color-rose-300: oklch(51.4% 0.222 16.935);
+  --color-sky-300: oklch(50% 0.134 242.749);
+}
+
+body {
+  background: var(--page);
+  color: var(--color-fg);
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-xl bg-zinc-800 px-3 py-2 text-sm outline-none ring-1 ring-fg/10 focus:ring-lime-400/60;
+  }
+}
+
+.driver-popover.jev-tour {
+  background: var(--color-zinc-900);
+  color: var(--color-fg);
+  border: 1px solid color-mix(in oklab, var(--color-fg) 12%, transparent);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  max-width: 320px;
+}
+
+.driver-popover.jev-tour .driver-popover-title {
+  font-family: var(--font-geist-sans);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.driver-popover.jev-tour .driver-popover-description {
+  font-family: var(--font-geist-sans);
+  color: var(--color-zinc-400);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.driver-popover.jev-tour .driver-popover-progress-text {
+  color: var(--color-zinc-500);
+}
+
+.driver-popover.jev-tour button {
+  font-family: var(--font-geist-sans);
+  text-shadow: none;
+  border-radius: 10px;
+  border: 0;
+  padding: 6px 12px;
+  background: var(--color-zinc-800);
+  color: var(--color-fg);
+}
+
+.driver-popover.jev-tour .driver-popover-next-btn {
+  background: #a3e635;
+  color: #000;
+  font-weight: 600;
+}
+
+.driver-popover.jev-tour .driver-popover-close-btn {
+  background: transparent;
+  color: var(--color-zinc-500);
+}
+
+.driver-popover.jev-tour .driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: var(--color-zinc-900);
+}
+
+.driver-popover.jev-tour .driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: var(--color-zinc-900);
+}
+
+.driver-popover.jev-tour .driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: var(--color-zinc-900);
+}
+
+.driver-popover.jev-tour .driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: var(--color-zinc-900);
+}
